@@ -22,10 +22,7 @@ import io.legado.app.lib.theme.primaryColor
 import io.legado.app.ui.book.search.SearchActivity
 import io.legado.app.ui.main.bookshelf.BaseBookshelfFragment
 import io.legado.app.ui.main.bookshelf.style1.books.BooksFragment
-import io.legado.app.utils.getPrefInt
-import io.legado.app.utils.putPrefInt
-import io.legado.app.utils.setEdgeEffectColor
-import io.legado.app.utils.toastOnUi
+import io.legado.app.utils.*
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 
 /**
@@ -35,6 +32,7 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
     TabLayout.OnTabSelectedListener,
     SearchView.OnQueryTextListener {
 
+    private val TAG: String = "||===>>DEBUG-BookshelfFragment1"
     private val binding by viewBinding(FragmentBookshelfBinding::bind)
     private val adapter by lazy { TabFragmentPageAdapter(childFragmentManager) }
     private val tabLayout: TabLayout by lazy {
@@ -62,8 +60,11 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
     private fun initView() {
         binding.viewPagerBookshelf.setEdgeEffectColor(primaryColor)
         tabLayout.isTabIndicatorFullWidth = false
+        // 可以通过左右划动来切换tab
         tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
         tabLayout.setSelectedTabIndicatorColor(requireContext().accentColor)
+        // 设置tab和ViewPager联运
+        // 这样设置后，tabLayout会将原先的tabs remove，然后取ViewPagerAdapter中的getPageTitle返回值赋给tabLayout，所以文件中并没有addTab相关的操作
         tabLayout.setupWithViewPager(binding.viewPagerBookshelf)
         binding.viewPagerBookshelf.offscreenPageLimit = 1
         binding.viewPagerBookshelf.adapter = adapter
@@ -78,11 +79,14 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
         return false
     }
 
+    // 在父类BaseBookshelfFragment的initBookGroupData方法中，从数据库中取出分组后，在这里将数据赋给adapter
     @Synchronized
     override fun upGroup(data: List<BookGroup>) {
         if (data.isEmpty()) {
+            DebugLog.d(TAG, "upGroup->No book group")
             appDb.bookGroupDao.enableGroup(AppConst.bookGroupAllId)
         } else {
+            DebugLog.d(TAG, "upGroup->book group=${data.toString()}");
             if (data != bookGroups) {
                 bookGroups.clear()
                 bookGroups.addAll(data)
@@ -92,9 +96,12 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
         }
     }
 
+    // 方法名有些歧义，应该是默认选中第一个分组
     @Synchronized
     private fun selectLastTab() {
         tabLayout.removeOnTabSelectedListener(this)
+        DebugLog.d(TAG, "selectLastTab->${getPrefInt(PreferKey.saveTabPosition, 0)}")
+        // 返回0，故默认初始化书架页面
         tabLayout.getTabAt(getPrefInt(PreferKey.saveTabPosition, 0))?.select()
         tabLayout.addOnTabSelectedListener(this)
     }
@@ -110,6 +117,7 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
     override fun onTabUnselected(tab: TabLayout.Tab) = Unit
 
     override fun onTabSelected(tab: TabLayout.Tab) {
+        DebugLog.d(TAG, "onTabSelected->tab.position=${tab.position}")
         putPrefInt(PreferKey.saveTabPosition, tab.position)
     }
 
@@ -117,9 +125,11 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
         fragmentMap[groupId]?.gotoTop()
     }
 
+    // ViewPager的adapter（全部、本地）
     private inner class TabFragmentPageAdapter(fm: FragmentManager) :
         FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
+        // 用于给联动的tabLayout设置标题
         override fun getPageTitle(position: Int): CharSequence {
             return bookGroups[position].groupName
         }
@@ -129,6 +139,7 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
         }
 
         override fun getItem(position: Int): Fragment {
+            DebugLog.d(TAG, "TabFragmentPageAdapter->getItem->position:$position")
             val group = bookGroups[position]
             return BooksFragment(position, group.groupId)
         }

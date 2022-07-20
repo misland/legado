@@ -105,6 +105,7 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
         })
     }
 
+    // 使用协程异步获取书架书本内容
     private fun upRecyclerData() {
         booksFlowJob?.cancel()
         booksFlowJob = launch {

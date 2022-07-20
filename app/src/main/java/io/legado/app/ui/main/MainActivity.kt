@@ -38,10 +38,7 @@ import io.legado.app.ui.main.explore.ExploreFragment
 import io.legado.app.ui.main.my.MyFragment
 import io.legado.app.ui.main.rss.RssFragment
 import io.legado.app.ui.widget.dialog.TextDialog
-import io.legado.app.utils.observeEvent
-import io.legado.app.utils.setEdgeEffectColor
-import io.legado.app.utils.showDialogFragment
-import io.legado.app.utils.toastOnUi
+import io.legado.app.utils.*
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -54,6 +51,7 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
     BottomNavigationView.OnNavigationItemSelectedListener,
     BottomNavigationView.OnNavigationItemReselectedListener {
 
+    val TAG: String = "||===>DEBUG-MainActivity"
     override val binding by viewBinding(ActivityMainBinding::inflate)
     override val viewModel by viewModels<MainViewModel>()
     private val idBookshelf = 0
@@ -100,7 +98,9 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
         syncAlert()
     }
 
+    // 主界面下方四个导航按钮事件，切换页面
     override fun onNavigationItemSelected(item: MenuItem): Boolean = binding.run {
+        DebugLog.d(TAG, "onNavigationItemSelected->item.itemId=${item.itemId}")
         when (item.itemId) {
             R.id.menu_bookshelf ->
                 viewPagerMain.setCurrentItem(0, false)
@@ -246,6 +246,7 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
         }
     }
 
+    // 计算询问导航栏有几个，因为订阅和发现两个导航栏可以设置中关闭
     private fun upBottomMenu() {
         val showDiscovery = AppConfig.showDiscovery
         val showRss = AppConfig.showRSS
@@ -275,6 +276,7 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
         return id
     }
 
+    // 修改底部导航栏图标样式，将选中的图标高亮
     private inner class PageChangeCallback : ViewPager.SimpleOnPageChangeListener() {
 
         override fun onPageSelected(position: Int) {
@@ -297,7 +299,9 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
             return POSITION_NONE
         }
 
+        // 主页面ViewPager显示的Fragment，根据选中的导航栏实例化对应的Fragment
         override fun getItem(position: Int): Fragment {
+            DebugLog.d(TAG, "TabFragmentPageAdapter->getItem->position=${position}")
             return when (getId(position)) {
                 idBookshelf1 -> BookshelfFragment1()
                 idBookshelf2 -> BookshelfFragment2()
@@ -311,7 +315,9 @@ class MainActivity : VMBaseActivity<ActivityMainBinding, MainViewModel>(),
             return bottomMenuCount
         }
 
+        // 调用getItem方法，对所有元素实例化，同时将实例化的Fragment放入fragmentMap集合中
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
+            DebugLog.d(TAG, "TabFragmentPageAdapter->instantiateItem->position=${position}")
             val fragment = super.instantiateItem(container, position) as Fragment
             fragmentMap[getId(position)] = fragment
             return fragment

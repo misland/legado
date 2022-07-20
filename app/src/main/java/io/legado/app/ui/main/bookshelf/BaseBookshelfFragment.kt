@@ -102,6 +102,7 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
 
     protected fun initBookGroupData() {
         groupsLiveData?.removeObservers(viewLifecycleOwner)
+        // 系统在初始化DB时默认插入了四个分组：全部、本地、音频、未分组
         groupsLiveData = appDb.bookGroupDao.show.apply {
             observe(viewLifecycleOwner) {
                 upGroup(it)

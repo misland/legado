@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import io.legado.app.utils.DebugLog
 import splitties.views.onLongClick
 
 /**
@@ -16,6 +17,8 @@ import splitties.views.onLongClick
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context: Context) :
     RecyclerView.Adapter<ItemViewHolder>() {
+
+    private val TAG: String = "||===>DEBUG-DiffRecyclerAdapter"
 
     val inflater: LayoutInflater = LayoutInflater.from(context)
 
@@ -47,6 +50,7 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
     }
 
     fun setItems(items: List<ITEM>?) {
+        DebugLog.d(TAG, "setItems->items=${items.toString()}")
         kotlin.runCatching {
             asyncListDiffer.submitList(items?.toMutableList())
         }
