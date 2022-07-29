@@ -35,6 +35,8 @@ import kotlin.math.max
 
 /**
  * 书架界面
+ * 主要工作：
+ * 1、从DB中获取对应分组的书籍（upRecyclerData）
  */
 class BooksFragment() : BaseFragment(R.layout.fragment_books),
     BaseBooksAdapter.CallBack {
@@ -46,6 +48,7 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
         arguments = bundle
     }
 
+    private val TAG: String = "||===>>DEBUG-BooksFragment"
     private val binding by viewBinding(FragmentBooksBinding::bind)
     private val activityViewModel by activityViewModels<MainViewModel>()
     private val bookshelfLayout by lazy {
@@ -128,6 +131,7 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
                 AppLog.put("书架更新出错", it)
             }.conflate().collect { list ->
                 binding.tvEmptyMsg.isGone = list.isNotEmpty()
+                DebugLog.d(TAG, "upRecyclerData->booksAdapter.setItems")
                 booksAdapter.setItems(list)
                 recoverPositionState()
                 delay(100)
@@ -186,6 +190,7 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
         }
     }
 
+    // 打开书籍，开始阅读
     override fun open(book: Book) {
         when (book.type) {
             BookType.audio ->
@@ -193,11 +198,13 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
                     putExtra("bookUrl", book.bookUrl)
                 }
             else -> startActivity<ReadBookActivity> {
+                DebugLog.d(TAG, "open->bookUrl=${book.bookUrl}")
                 putExtra("bookUrl", book.bookUrl)
             }
         }
     }
 
+    // 长按书籍后，弹出书籍信息页面
     override fun openBookInfo(book: Book) {
         startActivity<BookInfoActivity> {
             putExtra("name", book.name)

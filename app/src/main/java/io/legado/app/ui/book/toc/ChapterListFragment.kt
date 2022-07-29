@@ -19,6 +19,7 @@ import io.legado.app.lib.theme.getPrimaryTextColor
 import io.legado.app.ui.widget.recycler.UpLinearLayoutManager
 import io.legado.app.ui.widget.recycler.VerticalDivider
 import io.legado.app.utils.ColorUtils
+import io.legado.app.utils.DebugLog
 import io.legado.app.utils.observeEvent
 import io.legado.app.utils.viewbindingdelegate.viewBinding
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +32,8 @@ import kotlinx.coroutines.withContext
 class ChapterListFragment : VMBaseFragment<TocViewModel>(R.layout.fragment_chapter_list),
     ChapterListAdapter.Callback,
     TocViewModel.ChapterListCallBack {
+
+    private final  val TAG:String ="||===>>DEBUG-ChapterListFragment"
     override val viewModel by activityViewModels<TocViewModel>()
     private val binding by viewBinding(FragmentChapterListBinding::bind)
     private val mLayoutManager by lazy { UpLinearLayoutManager(requireContext()) }
@@ -119,6 +122,7 @@ class ChapterListFragment : VMBaseFragment<TocViewModel>(R.layout.fragment_chapt
                     else -> appDb.bookChapterDao.search(viewModel.bookUrl, searchKey)
                 }
             }.let {
+                DebugLog.d(TAG, "upChapterList->adapter.setItems")
                 adapter.setItems(it)
             }
         }

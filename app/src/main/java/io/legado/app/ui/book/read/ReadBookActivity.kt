@@ -87,6 +87,7 @@ class ReadBookActivity : BaseReadBookActivity(),
     TocRegexDialog.CallBack,
     ColorPickerDialogListener {
 
+    private val TAG: String = "||===>>DEBUG-ReadBookActivity"
     private val tocActivity =
         registerForActivityResult(TocActivityResult()) {
             it?.let {
@@ -495,6 +496,7 @@ class ReadBookActivity : BaseReadBookActivity(),
      * 松开按键事件
      */
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        DebugLog.d(TAG, "onKeyUp->keycode=${keyCode}")
         when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP, KeyEvent.KEYCODE_VOLUME_DOWN -> {
                 if (volumeKeyPage(PageDirection.NONE)) {
@@ -534,6 +536,10 @@ class ReadBookActivity : BaseReadBookActivity(),
      */
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouch(v: View, event: MotionEvent): Boolean = binding.run {
+        DebugLog.d(
+            TAG,
+            "onTouch->event.action=${event.action},ACTION_DOWN=${MotionEvent.ACTION_DOWN},ACTION_MOVE=${MotionEvent.ACTION_MOVE},ACTION_UP=${MotionEvent.ACTION_UP}"
+        )
         when (event.action) {
             MotionEvent.ACTION_DOWN -> textActionMenu.dismiss()
             MotionEvent.ACTION_MOVE -> {
@@ -676,11 +682,13 @@ class ReadBookActivity : BaseReadBookActivity(),
      * 音量键翻页
      */
     private fun volumeKeyPage(direction: PageDirection): Boolean {
+        DebugLog.d(TAG, "volumeKeyPage->direction=${direction}")
         if (!binding.readMenu.isVisible) {
             if (getPrefBoolean("volumeKeyPage", true)) {
                 if (getPrefBoolean("volumeKeyPageOnPlay")
                     || !BaseReadAloudService.isPlay()
                 ) {
+                    DebugLog.d(TAG, "volumeKeyPage->turn page")
                     binding.readView.pageDelegate?.isCancel = false
                     binding.readView.pageDelegate?.keyTurnPage(direction)
                     return true

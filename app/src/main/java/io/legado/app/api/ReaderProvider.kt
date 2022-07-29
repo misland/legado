@@ -13,6 +13,7 @@ import com.google.gson.Gson
 import io.legado.app.api.controller.BookController
 import io.legado.app.api.controller.BookSourceController
 import io.legado.app.api.controller.RssSourceController
+import io.legado.app.utils.DebugLog
 
 /**
  * Export book data to other app.
@@ -25,6 +26,7 @@ class ReaderProvider : ContentProvider() {
         SaveBookProgress
     }
 
+    private val TAG: String = "||===>>DEBUG-ReaderProvider"
     private val postBodyKey = "json"
     private val sMatcher by lazy {
         UriMatcher(UriMatcher.NO_MATCH).apply {
@@ -101,6 +103,7 @@ class ReaderProvider : ContentProvider() {
         uri: Uri, projection: Array<String>?, selection: String?,
         selectionArgs: Array<String>?, sortOrder: String?
     ): Cursor? {
+        DebugLog.d(TAG, "query->url=${uri.getQueryParameter("url")}")
         val map: MutableMap<String, ArrayList<String>> = HashMap()
         uri.getQueryParameter("url")?.let {
             map["url"] = arrayListOf(it)

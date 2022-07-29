@@ -4,10 +4,12 @@ import android.graphics.Bitmap
 import android.view.MotionEvent
 import io.legado.app.ui.book.read.page.ReadView
 import io.legado.app.ui.book.read.page.entities.PageDirection
+import io.legado.app.utils.DebugLog
 import io.legado.app.utils.screenshot
 
 abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readView) {
 
+    private val TAG: String = "||===>>DEBUG-HorizontalPageDelegate"
     protected var curBitmap: Bitmap? = null
     protected var prevBitmap: Bitmap? = null
     protected var nextBitmap: Bitmap? = null
@@ -36,6 +38,7 @@ abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readVie
     }
 
     override fun onTouch(event: MotionEvent) {
+        DebugLog.d(TAG, "onTouch->event=${event.action}")
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 abortAnim()
@@ -50,6 +53,7 @@ abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readVie
     }
 
     private fun onScroll(event: MotionEvent) {
+        DebugLog.d(TAG, "onScroll->event=${event.action}")
         val action: Int = event.action
         val pointerUp =
             action and MotionEvent.ACTION_MASK == MotionEvent.ACTION_POINTER_UP
@@ -99,22 +103,27 @@ abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readVie
     }
 
     override fun abortAnim() {
+        DebugLog.d(TAG, "abortAnim")
         isStarted = false
         isMoved = false
         isRunning = false
         if (!scroller.isFinished) {
+            DebugLog.d(TAG, "====================>>>>>>>>>>>one")
             readView.isAbortAnim = true
             scroller.abortAnimation()
             if (!isCancel) {
+                DebugLog.d(TAG, "abortAnim->readView.fillPage")
                 readView.fillPage(mDirection)
                 readView.invalidate()
             }
         } else {
+            DebugLog.d(TAG, "====================>>>>>>>>>>>two")
             readView.isAbortAnim = false
         }
     }
 
     override fun nextPageByAnim(animationSpeed: Int) {
+        DebugLog.d(TAG, "nextPageByAnim")
         abortAnim()
         if (!hasNext()) return
         setDirection(PageDirection.NEXT)

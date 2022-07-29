@@ -27,6 +27,8 @@ import io.legado.app.utils.viewbindingdelegate.viewBinding
 
 /**
  * 书架界面
+ * 主要工作有：
+ * 1、页面渲染（initView），为ViewPager设置adapter
  */
 class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
     TabLayout.OnTabSelectedListener,
@@ -138,6 +140,7 @@ class BookshelfFragment1 : BaseBookshelfFragment(R.layout.fragment_bookshelf),
             return POSITION_NONE
         }
 
+        // 初始化所选分组的书籍信息
         override fun getItem(position: Int): Fragment {
             DebugLog.d(TAG, "TabFragmentPageAdapter->getItem->position:$position")
             val group = bookGroups[position]

@@ -12,6 +12,7 @@ import io.legado.app.R
 import io.legado.app.base.BaseDialogFragment
 import io.legado.app.databinding.DialogChangeCoverBinding
 import io.legado.app.lib.theme.primaryColor
+import io.legado.app.utils.DebugLog
 import io.legado.app.utils.applyTint
 import io.legado.app.utils.setLayout
 import io.legado.app.utils.viewbindingdelegate.viewBinding
@@ -32,6 +33,7 @@ class ChangeCoverDialog() : BaseDialogFragment(R.layout.dialog_change_cover),
         }
     }
 
+    private val TAG: String = "||===>>DEBUG-ChangeCoverDialog"
     private val binding by viewBinding(DialogChangeCoverBinding::bind)
     private val callBack: CallBack? get() = activity as? CallBack
     private val viewModel: ChangeCoverViewModel by viewModels()
@@ -68,6 +70,7 @@ class ChangeCoverDialog() : BaseDialogFragment(R.layout.dialog_change_cover),
     private fun initData() {
         lifecycleScope.launchWhenStarted {
             viewModel.dataFlow.conflate().collect {
+                DebugLog.d(TAG, "initData->adapter.setItems")
                 adapter.setItems(it)
                 delay(1000)
             }

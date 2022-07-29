@@ -4,9 +4,11 @@ import io.legado.app.model.ReadBook
 import io.legado.app.ui.book.read.page.api.DataSource
 import io.legado.app.ui.book.read.page.api.PageFactory
 import io.legado.app.ui.book.read.page.entities.TextPage
+import io.legado.app.utils.DebugLog
 
 class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource) {
 
+    private val TAG: String = "||===>>DEBUG-TextPageFactory"
     override fun hasPrev(): Boolean = with(dataSource) {
         return hasPrevChapter() || pageIndex > 0
     }
@@ -33,7 +35,9 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
         } ?: ReadBook.setPageIndex(0)
     }
 
+    // 翻到下一页
     override fun moveToNext(upContent: Boolean): Boolean = with(dataSource) {
+        DebugLog.d(TAG, "moveToNext->upContent=${upContent}")
         return if (hasNext()) {
             if (currentChapter?.isLastIndex(pageIndex) == true) {
                 ReadBook.moveToNextChapter(upContent)

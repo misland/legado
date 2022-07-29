@@ -29,6 +29,11 @@ import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.ui.main.MainViewModel
 import io.legado.app.utils.*
 
+/*
+* 书架页面基类，主要工作有：
+* 1、初始化书籍分组，从DB中获取分组信息（initBookGroupData）
+* 2、为右上角菜单选项添加事件，启动对应的页面（onCompatOptionsItemSelected）
+* */
 abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfViewModel>(layoutId) {
 
     val activityViewModel by activityViewModels<MainViewModel>()

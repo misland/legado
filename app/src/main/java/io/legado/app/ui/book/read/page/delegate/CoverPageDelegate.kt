@@ -5,8 +5,10 @@ import android.graphics.Matrix
 import android.graphics.drawable.GradientDrawable
 import io.legado.app.ui.book.read.page.ReadView
 import io.legado.app.ui.book.read.page.entities.PageDirection
+import io.legado.app.utils.DebugLog
 
 class CoverPageDelegate(readView: ReadView) : HorizontalPageDelegate(readView) {
+    private val TAG: String = "||===>>DEBUG-CoverPageDelegate"
     private val bitmapMatrix = Matrix()
     private val shadowDrawableR: GradientDrawable
 
@@ -53,12 +55,14 @@ class CoverPageDelegate(readView: ReadView) : HorizontalPageDelegate(readView) {
     }
 
     override fun onAnimStop() {
+        DebugLog.d(TAG, "onAnimStop")
         if (!isCancel) {
             readView.fillPage(mDirection)
         }
     }
 
     override fun onAnimStart(animationSpeed: Int) {
+        DebugLog.d(TAG, "onAnimStart->isCancel=${isCancel},viewWidth=${viewWidth},startX=${startX},touchX=${touchX}")
         val distanceX: Float
         when (mDirection) {
             PageDirection.NEXT -> distanceX =
@@ -78,6 +82,10 @@ class CoverPageDelegate(readView: ReadView) : HorizontalPageDelegate(readView) {
                     viewWidth - (touchX - startX)
                 }
         }
+        DebugLog.d(
+            TAG,
+            "onAnimStart->startScroll(${touchX.toInt()}, 0, ${distanceX.toInt()}, 0, ${animationSpeed}})"
+        )
         startScroll(touchX.toInt(), 0, distanceX.toInt(), 0, animationSpeed)
     }
 

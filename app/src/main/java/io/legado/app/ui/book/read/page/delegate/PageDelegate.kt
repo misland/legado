@@ -11,10 +11,12 @@ import io.legado.app.R
 import io.legado.app.ui.book.read.page.PageView
 import io.legado.app.ui.book.read.page.ReadView
 import io.legado.app.ui.book.read.page.entities.PageDirection
+import io.legado.app.utils.DebugLog
 import kotlin.math.abs
 
 abstract class PageDelegate(protected val readView: ReadView) {
 
+    private val TAG: String = "||===>>DEBUG-PageDelegate"
     protected val context: Context = readView.context
 
     //起始点
@@ -70,6 +72,7 @@ abstract class PageDelegate(protected val readView: ReadView) {
     }
 
     protected fun startScroll(startX: Int, startY: Int, dx: Int, dy: Int, animationSpeed: Int) {
+        DebugLog.d(TAG, "startScroll(${startX},${startY},${dx},${dy})")
         val duration = if (dx != 0) {
             (animationSpeed * abs(dx)) / viewWidth
         } else {
@@ -95,10 +98,14 @@ abstract class PageDelegate(protected val readView: ReadView) {
         viewHeight = height
     }
 
+    // 在ReadView->computeScroll中调用，判断翻页是否完成，完成后将下一页数据填充至屏幕
     fun scroll() {
         if (scroller.computeScrollOffset()) {
+            DebugLog.d(TAG, "scroll==============>one")
             readView.setTouchPoint(scroller.currX.toFloat(), scroller.currY.toFloat())
         } else if (isStarted) {
+            DebugLog.d(TAG, "scroll==============>two")
+            // 具体实现在CoverPageDelegate中
             onAnimStop()
             stopScroll()
         }
@@ -114,10 +121,12 @@ abstract class PageDelegate(protected val readView: ReadView) {
 
     abstract fun onAnimStop() //scroller finish
 
+    // 阅读翻到下一页，具体实现在子类HorizontalPageDelegate中
     abstract fun nextPageByAnim(animationSpeed: Int)
 
     abstract fun prevPageByAnim(animationSpeed: Int)
 
+    // 阅读翻页
     open fun keyTurnPage(direction: PageDirection) {
         if (isRunning) return
         when (direction) {
@@ -141,6 +150,7 @@ abstract class PageDelegate(protected val readView: ReadView) {
      * 按下
      */
     fun onDown() {
+        DebugLog.d(TAG, "onDown")
         //是否移动
         isMoved = false
         //是否存在下一章

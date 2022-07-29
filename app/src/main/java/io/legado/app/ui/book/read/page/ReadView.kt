@@ -25,6 +25,7 @@ import io.legado.app.ui.book.read.page.entities.TextChapter
 import io.legado.app.ui.book.read.page.entities.TextPos
 import io.legado.app.ui.book.read.page.provider.ChapterProvider
 import io.legado.app.ui.book.read.page.provider.TextPageFactory
+import io.legado.app.utils.DebugLog
 import io.legado.app.utils.activity
 import io.legado.app.utils.screenshot
 import java.text.BreakIterator
@@ -36,6 +37,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     FrameLayout(context, attrs),
     DataSource {
 
+    private val TAG: String = "||===>>DEBUG-ReadView"
     val callBack: CallBack get() = activity as CallBack
     var pageFactory: TextPageFactory = TextPageFactory(this)
     var pageDelegate: PageDelegate? = null
@@ -147,7 +149,9 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
+    // 翻页时屏幕要往左（下一页时）或往右（上一页时）滚动，在滚动过程中会不停触发该函数
     override fun computeScroll() {
+        DebugLog.d(TAG, "computeScroll")
         pageDelegate?.scroll()
     }
 
@@ -156,10 +160,11 @@ class ReadView(context: Context, attrs: AttributeSet) :
     }
 
     /**
-     * 触摸事件
+     * 触摸事件：长按选择文字、点击翻页
      */
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        DebugLog.d(TAG, "onTouchEvent->event=${event.action}")
         callBack.screenOffTimerStart()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val insets =
@@ -174,6 +179,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                DebugLog.d(TAG, "onTouchEvent->ACTION_DOWN")
                 if (isTextSelected) {
                     curPage.cancelSelect()
                     isTextSelected = false
@@ -190,10 +196,15 @@ class ReadView(context: Context, attrs: AttributeSet) :
                 setStartPoint(event.x, event.y)
             }
             MotionEvent.ACTION_MOVE -> {
+                DebugLog.d(TAG, "onTouchEvent->ACTION_MOVE->isMove=${isMove}")
                 if (!isMove) {
                     isMove =
                         abs(startX - event.x) > slopSquare || abs(startY - event.y) > slopSquare
                 }
+                DebugLog.d(
+                    TAG,
+                    "onTouchEvent->ACTION_MOVE->isMove=${isMove},isTextSelected=${isTextSelected}"
+                )
                 if (isMove) {
                     longPressed = false
                     removeCallbacks(longPressRunnable)
@@ -205,15 +216,21 @@ class ReadView(context: Context, attrs: AttributeSet) :
                 }
             }
             MotionEvent.ACTION_UP -> {
+                DebugLog.d(
+                    TAG,
+                    "onTouchEvent->ACTION_UP->pressDown=${pressDown},isMove=${isMove},longPressed=${longPressed},pressOnTextSelected=${pressOnTextSelected}"
+                )
                 removeCallbacks(longPressRunnable)
                 if (!pressDown) return true
                 pressDown = false
                 if (!isMove) {
                     if (!longPressed && !pressOnTextSelected) {
+                        // 点击屏幕区域在下一页时，手指抬起时触发翻页操作，处理完后停止事件冒泡
                         onSingleTapUp()
                         return true
                     }
                 }
+                DebugLog.d(TAG, "onTouchEvent->ACTION_UP->isTextSelected=${isTextSelected}")
                 if (isTextSelected) {
                     callBack.showTextActionMenu()
                 } else if (isMove) {
@@ -222,6 +239,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
                 pressOnTextSelected = false
             }
             MotionEvent.ACTION_CANCEL -> {
+                DebugLog.d(TAG, "onTouchEvent->ACTION_CANCEL")
                 removeCallbacks(longPressRunnable)
                 if (!pressDown) return true
                 pressDown = false
@@ -349,7 +367,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     }
 
     /**
-     * 单击
+     * 单击屏幕事件处理
      */
     private fun onSingleTapUp() {
         when {
@@ -385,6 +403,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     }
 
     private fun click(action: Int) {
+        DebugLog.d(TAG, "click->action=${action}")
         when (action) {
             0 -> callBack.showActionMenu()
             1 -> pageDelegate?.nextPageByAnim(defaultAnimationSpeed)
@@ -428,7 +447,9 @@ class ReadView(context: Context, attrs: AttributeSet) :
         curPage.cancelSelect()
     }
 
+    // 将文字填充到页面
     fun fillPage(direction: PageDirection): Boolean {
+        DebugLog.d(TAG, "fillPage")
         return when (direction) {
             PageDirection.PREV -> {
                 pageFactory.moveToPrev(true)
@@ -463,6 +484,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     }
 
     override fun upContent(relativePosition: Int, resetPageOffset: Boolean) {
+        DebugLog.d(TAG, "upContent->pageFactory.curPage.text=${pageFactory.curPage.text}")
         curPage.setContentDescription(pageFactory.curPage.text)
         if (isScroll && !callBack.isAutoPage) {
             curPage.setContent(pageFactory.curPage, resetPageOffset)
