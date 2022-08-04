@@ -14,6 +14,7 @@ import io.legado.app.model.webBook.WebBook
 import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.book.read.page.entities.TextChapter
 import io.legado.app.ui.book.read.page.provider.ChapterProvider
+import io.legado.app.utils.DebugLog
 import io.legado.app.utils.msg
 import io.legado.app.utils.toastOnUi
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +27,7 @@ import kotlin.math.min
 
 @Suppress("MemberVisibilityCanBePrivate")
 object ReadBook : CoroutineScope by MainScope() {
+    private val TAG: String = "||========>>DEBUG-ReadBook"
     var book: Book? = null
     var callBack: CallBack? = null
     var inBookshelf = false
@@ -61,6 +63,7 @@ object ReadBook : CoroutineScope by MainScope() {
     }
 
     fun upData(book: Book) {
+        DebugLog.d(TAG, "bookUrl=${book.bookUrl}")
         ReadBook.book = book
         chapterSize = appDb.bookChapterDao.getChapterCount(book.bookUrl)
         if (durChapterIndex != book.durChapterIndex || tocChanged) {
@@ -125,6 +128,7 @@ object ReadBook : CoroutineScope by MainScope() {
     }
 
     fun upMsg(msg: String?) {
+        DebugLog.d(TAG, "upMsg->msg=${msg},ReadBook.msg=${ReadBook.msg}")
         if (ReadBook.msg != msg) {
             ReadBook.msg = msg
             callBack?.upContent()
@@ -194,8 +198,11 @@ object ReadBook : CoroutineScope by MainScope() {
     }
 
     fun setPageIndex(index: Int) {
+        DebugLog.d(TAG, "setPageIndex->index=${index}")
         durChapterPos = curTextChapter?.getReadLength(index) ?: index
+        DebugLog.d(TAG, "setPageIndex->saveRead")
         saveRead()
+        DebugLog.d(TAG, "setPageIndex->curPageChanged")
         curPageChanged()
     }
 
@@ -257,6 +264,8 @@ object ReadBook : CoroutineScope by MainScope() {
         resetPageOffset: Boolean = false,
         success: (() -> Unit)? = null
     ) {
+        DebugLog.d(TAG, "loadContent->loadingChapters=${loadingChapters.toString()}")
+        DebugLog.d(TAG, "loadContent->index=${index},upContent=${upContent}")
         if (addLoading(index)) {
             Coroutine.async {
                 val book = book!!

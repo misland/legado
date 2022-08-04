@@ -32,7 +32,9 @@ import java.text.BreakIterator
 import java.util.*
 import kotlin.math.abs
 
-
+/**
+ * 文本展现自定义View控制
+ * **/
 class ReadView(context: Context, attrs: AttributeSet) :
     FrameLayout(context, attrs),
     DataSource {
@@ -483,8 +485,12 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
+    // 将文本内容显示在屏幕上，并将下一页文本取出做好翻页准备
     override fun upContent(relativePosition: Int, resetPageOffset: Boolean) {
-        DebugLog.d(TAG, "upContent->pageFactory.curPage.text=${pageFactory.curPage.text}")
+        DebugLog.d(
+            TAG,
+            "upContent->relativePosition=${relativePosition},curPage=${pageFactory.curPage.text},nextPage=${pageFactory.nextPage.text}"
+        )
         curPage.setContentDescription(pageFactory.curPage.text)
         if (isScroll && !callBack.isAutoPage) {
             curPage.setContent(pageFactory.curPage, resetPageOffset)

@@ -8,7 +8,7 @@ import io.legado.app.utils.DebugLog
 
 class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource) {
 
-    private val TAG: String = "||===>>DEBUG-TextPageFactory"
+    private val TAG: String = "||======>>DEBUG-TextPageFactory"
     override fun hasPrev(): Boolean = with(dataSource) {
         return hasPrevChapter() || pageIndex > 0
     }
@@ -44,6 +44,8 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
             } else {
                 ReadBook.setPageIndex(pageIndex.plus(1))
             }
+            // upContent具体实现在ReadView中
+            DebugLog.d(TAG, "moveToNext->Update content")
             if (upContent) upContent(resetPageOffset = false)
             true
         } else
@@ -69,6 +71,7 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
                 return@with TextPage(text = it).format()
             }
             currentChapter?.let {
+                DebugLog.d(TAG, "curPage->page content=${it.getPage(pageIndex)?.text}")
                 return@with it.getPage(pageIndex) ?: TextPage(title = it.title).format()
             }
             return TextPage().format()
@@ -76,11 +79,13 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
 
     override val nextPage: TextPage
         get() = with(dataSource) {
+            DebugLog.d(TAG, "nextPage->ReadBook.msg is null: ${ReadBook.msg == null}")
             ReadBook.msg?.let {
                 return@with TextPage(text = it).format()
             }
             currentChapter?.let {
                 if (pageIndex < it.pageSize - 1) {
+                    DebugLog.d(TAG, "nextPage->page content=${it.getPage(pageIndex + 1)?.text}")
                     return@with it.getPage(pageIndex + 1)?.removePageAloudSpan()
                         ?: TextPage(title = it.title).format()
                 }
@@ -92,6 +97,7 @@ class TextPageFactory(dataSource: DataSource) : PageFactory<TextPage>(dataSource
                 return@with it.getPage(0)?.removePageAloudSpan()
                     ?: TextPage(title = it.title).format()
             }
+            DebugLog.d(TAG, "nextPage->return=${TextPage().format()}")
             return TextPage().format()
         }
 

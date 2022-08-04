@@ -28,10 +28,7 @@ import io.legado.app.service.BaseReadAloudService
 import io.legado.app.ui.book.read.page.entities.TextChapter
 import io.legado.app.ui.book.read.page.provider.ImageProvider
 import io.legado.app.ui.book.searchContent.SearchResult
-import io.legado.app.utils.msg
-import io.legado.app.utils.postEvent
-import io.legado.app.utils.toStringArray
-import io.legado.app.utils.toastOnUi
+import io.legado.app.utils.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 
@@ -39,6 +36,8 @@ import kotlinx.coroutines.launch
  * 阅读界面数据处理
  */
 class ReadBookViewModel(application: Application) : BaseViewModel(application) {
+
+    private val TAG: String = "||======>>DEBUG-ReadBookViewModel"
     val permissionDenialLiveData = MutableLiveData<Int>()
     var isInitFinish = false
     var searchContentQuery = ""
@@ -51,6 +50,7 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
      */
     fun initData(intent: Intent) {
         execute {
+            DebugLog.d(TAG, "initData->bookUrl=${intent.getStringExtra("bookUrl")}")
             ReadBook.inBookshelf = intent.getBooleanExtra("inBookshelf", true)
             ReadBook.tocChanged = intent.getBooleanExtra("tocChanged", false)
             val bookUrl = intent.getStringExtra("bookUrl")
@@ -68,6 +68,7 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
     }
 
     private fun initBook(book: Book) {
+        DebugLog.d(TAG, "initBook")
         val isSameBook = ReadBook.book?.bookUrl == book.bookUrl
         if (isSameBook) ReadBook.upData(book) else ReadBook.resetData(book)
         isInitFinish = true
