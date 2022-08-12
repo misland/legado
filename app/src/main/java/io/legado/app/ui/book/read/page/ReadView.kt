@@ -39,7 +39,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
     FrameLayout(context, attrs),
     DataSource {
 
-    private val TAG: String = "||===>>DEBUG-ReadView"
+    private val TAG: String = "||========>>DEBUG-ReadView"
     val callBack: CallBack get() = activity as CallBack
     var pageFactory: TextPageFactory = TextPageFactory(this)
     var pageDelegate: PageDelegate? = null
@@ -47,6 +47,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
             field?.onDestroy()
             field = null
             field = value
+            DebugLog.d(TAG, "pageDelegate->set")
             upContent()
         }
     var isScroll = false
@@ -463,9 +464,11 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
+    // 组件初始化时执行一次，后续由页面调用
     fun upPageAnim() {
         isScroll = ReadBook.pageAnim() == 3
         ChapterProvider.upLayout()
+        DebugLog.d(TAG, "upPageAnim->pageAnim=${ReadBook.pageAnim()}")
         when (ReadBook.pageAnim()) {
             PageAnim.coverPageAnim -> if (pageDelegate !is CoverPageDelegate) {
                 pageDelegate = CoverPageDelegate(this)
@@ -487,10 +490,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
 
     // 将文本内容显示在屏幕上，并将下一页文本取出做好翻页准备
     override fun upContent(relativePosition: Int, resetPageOffset: Boolean) {
-        DebugLog.d(
-            TAG,
-            "upContent->relativePosition=${relativePosition},curPage=${pageFactory.curPage.text},nextPage=${pageFactory.nextPage.text}"
-        )
+        DebugLog.d(TAG, "upContent->relativePosition=${relativePosition}")
         curPage.setContentDescription(pageFactory.curPage.text)
         if (isScroll && !callBack.isAutoPage) {
             curPage.setContent(pageFactory.curPage, resetPageOffset)
@@ -500,6 +500,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
                 -1 -> prevPage.setContent(pageFactory.prevPage)
                 1 -> nextPage.setContent(pageFactory.nextPage)
                 else -> {
+                    // setContent调用ContentTextView组件的setContent方法，将页面数据传递过去，重新绘制页面，将文字绘制在页面上
                     curPage.setContent(pageFactory.curPage)
                     nextPage.setContent(pageFactory.nextPage)
                     prevPage.setContent(pageFactory.prevPage)

@@ -26,6 +26,7 @@ import java.util.regex.Pattern
  */
 object LocalBook {
 
+    private val TAG: String = "||========>>DEBUG-LocalBook"
     private val nameAuthorPatterns = arrayOf(
         Pattern.compile("(.*?)《([^《》]+)》.*?作者：(.*)"),
         Pattern.compile("(.*?)《([^《》]+)》(.*)"),
@@ -36,6 +37,7 @@ object LocalBook {
     @Throws(FileNotFoundException::class, SecurityException::class)
     fun getBookInputStream(book: Book): InputStream {
         val uri = Uri.parse(book.bookUrl)
+        DebugLog.d(TAG, "getBookInputStream->uri=${uri},path=${uri.path}")
         if (uri.isContentScheme()) {
             return appCtx.contentResolver.openInputStream(uri)!!
         }

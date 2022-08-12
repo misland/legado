@@ -5,10 +5,7 @@ import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.TxtTocRule
 import io.legado.app.help.DefaultData
-import io.legado.app.utils.EncodingDetect
-import io.legado.app.utils.MD5Utils
-import io.legado.app.utils.StringUtils
-import io.legado.app.utils.Utf8BomUtils
+import io.legado.app.utils.*
 import java.io.FileNotFoundException
 import java.nio.charset.Charset
 import java.util.regex.Matcher
@@ -17,7 +14,10 @@ import kotlin.math.min
 
 class TextFile(private val book: Book) {
 
+    private val TAG: String = "||========>>DEBUG-TextFile"
+
     companion object {
+        private const val TAG: String = "||========>>DEBUG-TextFile->companion object"
 
         @Throws(FileNotFoundException::class)
         fun getChapterList(book: Book): ArrayList<BookChapter> {
@@ -26,6 +26,7 @@ class TextFile(private val book: Book) {
 
         @Throws(FileNotFoundException::class)
         fun getContent(book: Book, bookChapter: BookChapter): String {
+            DebugLog.d(TAG, "getContent->start=${bookChapter.start},end=${bookChapter.end}")
             val count = (bookChapter.end!! - bookChapter.start!!).toInt()
             val buffer = ByteArray(count)
             LocalBook.getBookInputStream(book).use { bis ->

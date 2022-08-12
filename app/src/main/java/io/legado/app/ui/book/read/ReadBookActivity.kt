@@ -87,7 +87,7 @@ class ReadBookActivity : BaseReadBookActivity(),
     TocRegexDialog.CallBack,
     ColorPickerDialogListener {
 
-    private val TAG: String = "||===>>DEBUG-ReadBookActivity"
+    private val TAG: String = "||========>>DEBUG-ReadBookActivity"
     private val tocActivity =
         registerForActivityResult(TocActivityResult()) {
             it?.let {
@@ -171,6 +171,7 @@ class ReadBookActivity : BaseReadBookActivity(),
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
+        // 初始化书籍，恢复阅读进度，从文件中读取内容等
         viewModel.initData(intent)
     }
 
@@ -699,6 +700,7 @@ class ReadBookActivity : BaseReadBookActivity(),
     }
 
     override fun upMenuView() {
+        DebugLog.d(TAG, "upMenuView")
         launch {
             upMenu()
             binding.readMenu.upBookView()
@@ -731,6 +733,10 @@ class ReadBookActivity : BaseReadBookActivity(),
     ) {
         launch {
             autoPageProgress = 0
+            DebugLog.d(
+                TAG,
+                "upContent->relativePosition=${relativePosition},resetPageOffset=${resetPageOffset}"
+            )
             binding.readView.upContent(relativePosition, resetPageOffset)
             binding.readMenu.setSeekPage(ReadBook.durPageIndex)
             loadStates = false
@@ -739,6 +745,7 @@ class ReadBookActivity : BaseReadBookActivity(),
     }
 
     override fun upPageAnim() {
+        DebugLog.d(TAG, "upPageAnim")
         launch {
             binding.readView.upPageAnim()
         }
@@ -1162,6 +1169,10 @@ class ReadBookActivity : BaseReadBookActivity(),
         observeEvent<String>(EventBus.TIME_CHANGED) { readView.upTime() }
         observeEvent<Int>(EventBus.BATTERY_CHANGED) { readView.upBattery(it) }
         observeEvent<BookChapter>(EventBus.OPEN_CHAPTER) {
+            DebugLog.d(
+                TAG,
+                "observeLiveBus->OPEN_CHAPTER->index=${it.index},durChapter=${ReadBook.durChapterPos}"
+            )
             viewModel.openChapter(it.index, ReadBook.durChapterPos)
             readView.upContent()
         }
@@ -1173,6 +1184,7 @@ class ReadBookActivity : BaseReadBookActivity(),
             }
         }
         observeEvent<Boolean>(EventBus.UP_CONFIG) {
+            // 页面初始化后会触发该事件，传值true
             upSystemUiVisibility()
             readView.upBg()
             readView.upStyle()
@@ -1189,6 +1201,7 @@ class ReadBookActivity : BaseReadBookActivity(),
                     val page = textChapter.getPageByReadPos(ReadBook.durChapterPos)
                     if (page != null) {
                         page.removePageAloudSpan()
+                        DebugLog.d(TAG, "observeLiveBus->ALOUD_STATE->upContent")
                         readView.upContent(resetPageOffset = false)
                     }
                 }

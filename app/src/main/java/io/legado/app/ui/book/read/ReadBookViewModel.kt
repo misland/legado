@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
  */
 class ReadBookViewModel(application: Application) : BaseViewModel(application) {
 
-    private val TAG: String = "||======>>DEBUG-ReadBookViewModel"
+    private val TAG: String = "||========>>DEBUG-ReadBookViewModel"
     val permissionDenialLiveData = MutableLiveData<Int>()
     var isInitFinish = false
     var searchContentQuery = ""
@@ -67,12 +67,17 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
+    // 打开书籍时，初始化书籍信息：阅读章节、总章节数等，并获取要展示的文本
     private fun initBook(book: Book) {
-        DebugLog.d(TAG, "initBook")
         val isSameBook = ReadBook.book?.bookUrl == book.bookUrl
         if (isSameBook) ReadBook.upData(book) else ReadBook.resetData(book)
+        DebugLog.d(
+            TAG,
+            "initBook->isSameBook=${isSameBook},tocUrl=${book.tocUrl.isEmpty()},chapterSize=${ReadBook.chapterSize}"
+        )
         isInitFinish = true
         if (ReadBook.chapterSize == 0) {
+            DebugLog.d(TAG, "initBook->tocUrl=${book.tocUrl.isEmpty()}")
             if (book.tocUrl.isEmpty()) {
                 loadBookInfo(book)
             } else {
@@ -89,6 +94,7 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
                 ReadBook.loadContent(resetPageOffset = true)
             }
         } else {
+            DebugLog.d(TAG, "initBook->prepare to load content")
             if (ReadBook.durChapterIndex > ReadBook.chapterSize - 1) {
                 ReadBook.durChapterIndex = ReadBook.chapterSize - 1
             }
@@ -107,6 +113,7 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
      * 加载详情页
      */
     private fun loadBookInfo(book: Book) {
+        DebugLog.d(TAG, "loadBookInfo->isLocalBook=${book.isLocalBook()}")
         if (book.isLocalBook()) {
             loadChapterList(book)
         } else {
@@ -125,9 +132,11 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
      * 加载目录
      */
     fun loadChapterList(book: Book) {
+        DebugLog.d(TAG, "loadChapterList->isLocalBook=${book.isLocalBook()}")
         if (book.isLocalBook()) {
             execute {
                 LocalBook.getChapterList(book).let {
+                    DebugLog.d(TAG, "loadChapterList->chapterSize=${it.size}")
                     book.latestChapterTime = System.currentTimeMillis()
                     appDb.bookChapterDao.delByBook(book.bookUrl)
                     appDb.bookChapterDao.insert(*it.toTypedArray())

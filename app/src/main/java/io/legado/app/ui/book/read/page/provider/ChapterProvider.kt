@@ -28,6 +28,8 @@ import java.util.*
 object ChapterProvider {
     private const val srcReplaceChar = "▩"
 
+    private val TAG: String = "||========>>DEBUG-ChapterProvider"
+
     @JvmStatic
     var viewWidth = 0
         private set
@@ -113,6 +115,8 @@ object ChapterProvider {
         var absStartX = paddingLeft
         var durY = 0f
         textPages.add(TextPage())
+        DebugLog.d(TAG, "getTextChapter->titleMode=${ReadBookConfig.titleMode},paddingLeft=${paddingLeft}")
+        // titleMode默认为0
         if (ReadBookConfig.titleMode != 2) {
             displayTitle.splitNotBlank("\n").forEach { text ->
                 setTypeText(
@@ -276,6 +280,7 @@ object ChapterProvider {
         srcList: LinkedList<String>? = null
     ): Pair<Int, Float> {
         var absStartX = x
+        // useZhLayout默认为false
         val layout = if (ReadBookConfig.useZhLayout) {
             ZhLayout(text, textPaint, visibleWidth)
         } else StaticLayout(

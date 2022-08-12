@@ -46,6 +46,7 @@ object ReadBook : CoroutineScope by MainScope() {
     var readStartTime: Long = System.currentTimeMillis()
 
     fun resetData(book: Book) {
+        DebugLog.d(TAG, "resetData")
         ReadBook.book = book
         readRecord.bookName = book.name
         readRecord.readTime = appDb.readRecordDao.getReadTime(book.name) ?: 0
@@ -53,6 +54,10 @@ object ReadBook : CoroutineScope by MainScope() {
         durChapterIndex = book.durChapterIndex
         durChapterPos = book.durChapterPos
         isLocalBook = book.origin == BookType.local
+        DebugLog.d(
+            TAG,
+            "resetData->durChapterIndex=${durChapterIndex},chapterSize=${chapterSize},isLocalBook=${isLocalBook}"
+        )
         clearTextChapter()
         callBack?.upMenuView()
         callBack?.upPageAnim()
@@ -232,6 +237,7 @@ object ReadBook : CoroutineScope by MainScope() {
      */
     val durPageIndex: Int
         get() {
+            DebugLog.d(TAG, "durPageIndex->get")
             return curTextChapter?.getPageIndexByCharIndex(durChapterPos) ?: durChapterPos
         }
 
@@ -264,13 +270,22 @@ object ReadBook : CoroutineScope by MainScope() {
         resetPageOffset: Boolean = false,
         success: (() -> Unit)? = null
     ) {
-        DebugLog.d(TAG, "loadContent->loadingChapters=${loadingChapters.toString()}")
-        DebugLog.d(TAG, "loadContent->index=${index},upContent=${upContent}")
+        DebugLog.d(TAG, "loadContent->loadingChapters=${loadingChapters.toString()},index=${index},upContent=${upContent}")
         if (addLoading(index)) {
             Coroutine.async {
                 val book = book!!
                 appDb.bookChapterDao.getChapter(book.bookUrl, index)?.let { chapter ->
+                    // 章节完整内容取出
                     BookHelp.getContent(book, chapter)?.let {
+                        DebugLog.d(
+                            TAG,
+                            "loadContent->chapter index=${index},content=${
+                                it.substring(
+                                    0,
+                                    (if (it.length > 100) 100 else it.length - 1)
+                                )
+                            }"
+                        )
                         contentLoadFinish(book, chapter, it, upContent, resetPageOffset) {
                             success?.invoke()
                         }
@@ -359,14 +374,19 @@ object ReadBook : CoroutineScope by MainScope() {
             removeLoading(chapter.index)
             if (chapter.index in durChapterIndex - 1..durChapterIndex + 1) {
                 val contentProcessor = ContentProcessor.get(book.name, book.origin)
+                // 章节名字
                 val displayTitle = chapter.getDisplayTitle(
                     contentProcessor.getTitleReplaceRules(),
                     book.getUseReplaceRule()
                 )
+                // 1、将原文中章节title移除，避免重复展示，因为已经拿到title了；2、根据换行符重新分段，处理文本
                 val contents = contentProcessor
                     .getContent(book, chapter, content, includeTitle = false)
+                DebugLog.d(TAG, "contentLoadFinish->displayTitle=${displayTitle},contents length=${contents.size}")
+                // 将章节的全部文本处理成一页一页
                 val textChapter = ChapterProvider
                     .getTextChapter(book, chapter, displayTitle, contents, chapterSize)
+                // 根据当前记录的阅读至的页面，设置上、当前、下章内容
                 when (val offset = chapter.index - durChapterIndex) {
                     0 -> {
                         curTextChapter = textChapter
@@ -458,6 +478,7 @@ object ReadBook : CoroutineScope by MainScope() {
         }
     }
 
+    // 具体实现在ReadBookActivity中
     interface CallBack {
         fun upMenuView()
 

@@ -23,6 +23,7 @@ import kotlin.math.min
 
 @Suppress("unused")
 object BookHelp {
+    private val TAG: String = "||========>>DEBUG-BookHelp"
     private val downloadDir: File = appCtx.externalFiles
     private const val cacheFolderName = "book_cache"
     private const val cacheImageFolderName = "images"
@@ -212,12 +213,17 @@ object BookHelp {
      * 读取章节内容
      */
     fun getContent(book: Book, bookChapter: BookChapter): String? {
+        DebugLog.d(
+            TAG,
+            "getContent->cacheFolderName=${cacheFolderName},folderName=${book.getFolderName()},fileName=${bookChapter.getFileName()},index=${bookChapter.index}"
+        )
         val file = downloadDir.getFile(
             cacheFolderName,
             book.getFolderName(),
             bookChapter.getFileName()
         )
         if (file.exists()) {
+            DebugLog.d(TAG, "getContent->text=${file.readText()}")
             return file.readText()
         }
         if (book.isLocalBook()) {
