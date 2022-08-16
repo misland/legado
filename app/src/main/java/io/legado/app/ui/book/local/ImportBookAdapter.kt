@@ -14,9 +14,12 @@ import io.legado.app.utils.*
 
 class ImportBookAdapter(context: Context, val callBack: CallBack) :
     RecyclerAdapter<FileDoc, ItemImportBookBinding>(context) {
+
+    private val TAG: String = "||========>>DEBUG-ImportBookAdapter"
     val selectedUris = hashSetOf<String>()
     var checkableCount = 0
     private val bookFileNames = arrayListOf<String>()
+
 
     override fun getViewBinding(parent: ViewGroup): ItemImportBookBinding {
         return ItemImportBookBinding.inflate(inflater, parent, false)
@@ -32,6 +35,10 @@ class ImportBookAdapter(context: Context, val callBack: CallBack) :
         item: FileDoc,
         payloads: MutableList<Any>
     ) {
+        DebugLog.d(
+            TAG,
+            "convert->payloads=${payloads},item=${item.name},bookFileNames=${bookFileNames}"
+        )
         binding.run {
             if (payloads.isEmpty()) {
                 if (item.isDir) {
@@ -82,6 +89,7 @@ class ImportBookAdapter(context: Context, val callBack: CallBack) :
 
     @SuppressLint("NotifyDataSetChanged")
     fun upBookHas(bookUrls: List<String>) {
+        DebugLog.d(TAG, "upBookHas->bookUrls=${bookUrls}")
         bookFileNames.clear()
         bookUrls.forEach {
             val path = Uri.decode(it)

@@ -14,6 +14,8 @@ import java.nio.charset.Charset
 @Suppress("MemberVisibilityCanBePrivate")
 object DocumentUtils {
 
+    private val TAG: String = "||========>>DEBUG-DocumentUtils"
+
     fun exists(root: DocumentFile, fileName: String, vararg subDirs: String): Boolean {
         val parent = getDirDocument(root, *subDirs) ?: return false
         return parent.findFile(fileName)?.exists() ?: false
@@ -129,6 +131,7 @@ object DocumentUtils {
                                 .buildDocumentUriUsingTree(uri, cursor.getString(ici))
                         )
                         if (filter == null || filter.invoke(item)) {
+                            DebugLog.d(TAG, "listFiles->item={uri=${item.uri},nci=${item.name}}")
                             docList.add(item)
                         }
                     } while (cursor.moveToNext())

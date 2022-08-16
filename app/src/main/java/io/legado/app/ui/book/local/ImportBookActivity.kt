@@ -39,6 +39,7 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
     ImportBookAdapter.CallBack,
     SelectActionBar.CallBack {
 
+    private val TAG: String = "||========>>DEBUG-ImportBookActivity"
     override val binding by viewBinding(ActivityImportBookBinding::inflate)
     override val viewModel by viewModels<ImportBookViewModel>()
     private val adapter by lazy { ImportBookAdapter(this, this) }
@@ -107,6 +108,7 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onClickSelectBarMainAction() {
+        DebugLog.d(TAG, "onClickSelectBarMainAction->uris=${adapter.selectedUris}")
         viewModel.addToBookshelf(adapter.selectedUris) {
             adapter.selectedUris.clear()
             adapter.notifyDataSetChanged()
@@ -136,6 +138,7 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
         }
         launch {
             appDb.bookDao.flowLocalUri().conflate().collect {
+                DebugLog.d(TAG, "initData->books in DB=${it}")
                 adapter.upBookHas(it)
             }
         }
@@ -148,6 +151,7 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
 
     private fun initRootDoc(changedFolder: Boolean = false) {
         val lastPath = AppConfig.importBookPath
+        DebugLog.d(TAG, "initRootDoc->rootDoc=${viewModel.rootDoc != null},lastPath=${lastPath}")
         when {
             viewModel.rootDoc != null && !changedFolder -> upPath()
             lastPath.isNullOrEmpty() -> {
@@ -155,13 +159,16 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
                 selectFolder.launch()
             }
             lastPath.isContentScheme() -> {
+                DebugLog.d(TAG, "initRootDoc->lastPath.isContentScheme=true")
                 val rootUri = Uri.parse(lastPath)
                 kotlin.runCatching {
                     val doc = DocumentFile.fromTreeUri(this, rootUri)
                     if (doc == null || doc.name.isNullOrEmpty()) {
+                        DebugLog.d(TAG, "didn't find files in root path")
                         binding.tvEmptyMsg.visible()
                         selectFolder.launch()
                     } else {
+                        DebugLog.d(TAG, "find files in root path")
                         viewModel.subDocs.clear()
                         viewModel.rootDoc = FileDoc.fromDocumentFile(doc)
                         upDocs(viewModel.rootDoc!!)
@@ -217,14 +224,17 @@ class ImportBookActivity : VMBaseActivity<ActivityImportBookBinding, ImportBookV
     private fun upDocs(rootDoc: FileDoc) {
         binding.tvEmptyMsg.gone()
         var path = rootDoc.name + File.separator
+        DebugLog.d(TAG, "upDocs->rootDoc=${rootDoc},path=${path}")
         var lastDoc = rootDoc
         for (doc in viewModel.subDocs) {
             lastDoc = doc
             path = path + doc.name + File.separator
+            DebugLog.d(TAG, "upDocs->subDocs path=${path}")
         }
         binding.tvPath.text = path
         adapter.selectedUris.clear()
         adapter.clearItems()
+        DebugLog.d(TAG, "upDocs->lastDoc=${lastDoc.uri}")
         viewModel.loadDoc(lastDoc.uri)
     }
 

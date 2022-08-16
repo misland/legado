@@ -22,6 +22,7 @@ import java.io.File
 import java.util.*
 
 class ImportBookViewModel(application: Application) : BaseViewModel(application) {
+    private val TAG: String = "||========>>DEBUG-ImportBookViewModel"
     var rootDoc: FileDoc? = null
     val subDocs = arrayListOf<FileDoc>()
     var sort = context.getPrefInt(PreferKey.localBookImportSort)
@@ -59,6 +60,7 @@ class ImportBookViewModel(application: Application) : BaseViewModel(application)
         }
 
     }.map { docList ->
+        DebugLog.d(TAG, "dataFlow->sort=${sort}")
         when (sort) {
             2 -> docList.sortedWith(
                 compareBy({ !it.isDir }, { -it.lastModified }, { it.name })
@@ -104,6 +106,8 @@ class ImportBookViewModel(application: Application) : BaseViewModel(application)
 
     fun loadDoc(uri: Uri) {
         execute {
+            DebugLog.d(TAG, "loadDoc->uri=${uri}")
+            // 查找根目录下的所有文件/文件夹，如果是隐藏文件/文件夹，则过滤掉
             val docList = DocumentUtils.listFiles(uri) { item ->
                 when {
                     item.name.startsWith(".") -> false
@@ -111,6 +115,7 @@ class ImportBookViewModel(application: Application) : BaseViewModel(application)
                     else -> item.name.matches(bookFileRegex)
                 }
             }
+            DebugLog.d(TAG, "loadDoc->docList=${docList}")
             dataCallback?.setItems(docList)
         }.onError {
             context.toastOnUi("获取文件列表出错\n${it.localizedMessage}")

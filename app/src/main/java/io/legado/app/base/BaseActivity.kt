@@ -51,6 +51,7 @@ abstract class BaseActivity<VB : ViewBinding>(
         super.attachBaseContext(AppContextWrapper.wrap(newBase))
     }
 
+    // 如果View是FrameLayout，就设置背景颜色
     override fun onCreateView(
         parent: View?,
         name: String,
@@ -63,6 +64,7 @@ abstract class BaseActivity<VB : ViewBinding>(
         return super.onCreateView(parent, name, context, attrs)
     }
 
+    // 绑定layout、设置theme、设置系统菜单等
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.disableAutoFill()
         initTheme()

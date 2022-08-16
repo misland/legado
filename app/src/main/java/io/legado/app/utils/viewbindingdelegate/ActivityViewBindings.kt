@@ -14,6 +14,8 @@ inline fun <T : ViewBinding> ComponentActivity.viewBinding(
     crossinline bindingInflater: (LayoutInflater) -> T,
     setContentView: Boolean = false
 ) = lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    // XxxBinding.inflate(LayoutInflater)
+    // 作用是加载布局，但是并未与Activity绑定，绑定需要使用下面的setContentView
     val binding = bindingInflater.invoke(layoutInflater)
     if (setContentView) {
         setContentView(binding.root)
