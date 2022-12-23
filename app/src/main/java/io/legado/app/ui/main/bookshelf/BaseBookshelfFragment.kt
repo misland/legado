@@ -23,10 +23,10 @@ import io.legado.app.ui.book.cache.CacheActivity
 import io.legado.app.ui.book.group.GroupManageDialog
 import io.legado.app.ui.book.local.ImportBookActivity
 import io.legado.app.ui.book.manage.BookshelfManageActivity
-import io.legado.app.ui.book.remote.RemoteBookActivity
 import io.legado.app.ui.book.search.SearchActivity
 import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.ui.main.MainViewModel
+import io.legado.app.ui.main.my.MyActivity
 import io.legado.app.utils.*
 
 /*
@@ -36,7 +36,7 @@ import io.legado.app.utils.*
 * */
 abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfViewModel>(layoutId) {
 
-    val activityViewModel by activityViewModels<MainViewModel>()
+    private val activityViewModel by activityViewModels<MainViewModel>()
     override val viewModel by viewModels<BookshelfViewModel>()
 
     private val importBookshelf = registerForActivityResult(HandleFileContract()) {
@@ -80,14 +80,11 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
     override fun onCompatOptionsItemSelected(item: MenuItem) {
         super.onCompatOptionsItemSelected(item)
         when (item.itemId) {
-            // 查看远程书籍
-            R.id.menu_remote -> startActivity<RemoteBookActivity>()
             R.id.menu_search -> startActivity<SearchActivity>()
             R.id.menu_update_toc -> activityViewModel.upToc(books)
             R.id.menu_bookshelf_layout -> configBookshelf()
             R.id.menu_group_manage -> showDialogFragment<GroupManageDialog>()
             R.id.menu_add_local -> startActivity<ImportBookActivity>()
-            R.id.menu_add_url -> addBookByUrl()
             R.id.menu_bookshelf_manage -> startActivity<BookshelfManageActivity> {
                 putExtra("groupId", groupId)
             }
@@ -101,6 +98,7 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
                 }
             }
             R.id.menu_import_bookshelf -> importBookshelfAlert(groupId)
+            R.id.menu_my -> startActivity<MyActivity>()
             R.id.menu_log -> showDialogFragment<AppLogDialog>()
         }
     }
@@ -116,22 +114,6 @@ abstract class BaseBookshelfFragment(layoutId: Int) : VMBaseFragment<BookshelfVi
     }
 
     abstract fun upGroup(data: List<BookGroup>)
-
-    @SuppressLint("InflateParams")
-    fun addBookByUrl() {
-        alert(titleResource = R.string.add_book_url) {
-            val alertBinding = DialogEditTextBinding.inflate(layoutInflater).apply {
-                editView.hint = "url"
-            }
-            customView { alertBinding.root }
-            okButton {
-                alertBinding.editView.text?.toString()?.let {
-                    viewModel.addBookByUrl(it)
-                }
-            }
-            noButton()
-        }
-    }
 
     @SuppressLint("InflateParams")
     fun configBookshelf() {

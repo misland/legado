@@ -28,7 +28,6 @@ import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.theme.*
 import io.legado.app.model.ReadBook
 import io.legado.app.ui.book.info.BookInfoActivity
-import io.legado.app.ui.browser.WebViewActivity
 import io.legado.app.ui.widget.seekbar.SeekBarChangeListener
 import io.legado.app.utils.*
 import splitties.views.*
@@ -177,12 +176,6 @@ class ReadMenu @JvmOverloads constructor(
             if (AppConfig.readUrlInBrowser) {
                 context.openUrl(tvChapterUrl.text.toString().substringBefore(",{"))
             } else {
-                context.startActivity<WebViewActivity> {
-                    val url = tvChapterUrl.text.toString()
-                    putExtra("title", tvChapterName.text)
-                    putExtra("url", url)
-                    IntentData.put(url, ReadBook.bookSource?.getHeaderMap(true))
-                }
             }
         }
         val chapterViewLongClickListener = OnLongClickListener {

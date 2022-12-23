@@ -4,7 +4,6 @@ import io.legado.app.constant.AppLog
 import io.legado.app.data.entities.BaseSource
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.ui.association.VerificationCodeActivity
-import io.legado.app.ui.browser.WebViewActivity
 import io.legado.app.utils.startActivity
 import kotlinx.coroutines.runBlocking
 import splitties.init.appCtx
@@ -54,13 +53,6 @@ object SourceVerificationHelp {
     fun startBrowser(source: BaseSource?, url: String, title: String, saveResult: Boolean? = false) {
         source ?: throw NoStackTraceException("startBrowser parameter source cannot be null")
         key = "${source.getKey()}_verificationResult"
-        appCtx.startActivity<WebViewActivity> {
-            putExtra("title", title)
-            putExtra("url", url)
-            putExtra("sourceOrigin", source.getKey())
-            putExtra("sourceVerificationEnable", saveResult)
-            IntentData.put(url, source.getHeaderMap(true))
-        }
     }
 
     fun checkResult() {

@@ -85,12 +85,22 @@ class ReadView(context: Context, attrs: AttributeSet) :
     private val initialTextPos = TextPos(0, 0, 0)
 
     val slopSquare by lazy { ViewConfiguration.get(context).scaledTouchSlop }
+
+    // 第一行左边
     private val tlRect = RectF()
+
+    // 第一行中间
     private val tcRect = RectF()
+
+    // 第一行右边
     private val trRect = RectF()
+
+    // 第二行左边
     private val mlRect = RectF()
     private val mcRect = RectF()
     private val mrRect = RectF()
+
+    // 第三行左边
     private val blRect = RectF()
     private val bcRect = RectF()
     private val brRect = RectF()
@@ -109,6 +119,7 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
+    // 为九宫格设置对应区域
     private fun setRect9x() {
         tlRect.set(0f, 0f, width * 0.33f, height * 0.33f)
         tcRect.set(width * 0.33f, 0f, width * 0.66f, height * 0.33f)
@@ -373,34 +384,14 @@ class ReadView(context: Context, attrs: AttributeSet) :
      * 单击屏幕事件处理
      */
     private fun onSingleTapUp() {
+        // 魔改：除了中间区域召唤菜单外，其它的区域，均改为下一页
         when {
             isTextSelected -> isTextSelected = false
             mcRect.contains(startX, startY) -> if (!isAbortAnim) {
                 click(AppConfig.clickActionMC)
             }
-            bcRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionBC)
-            }
-            blRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionBL)
-            }
-            brRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionBR)
-            }
-            mlRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionML)
-            }
-            mrRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionMR)
-            }
-            tlRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionTL)
-            }
-            tcRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionTC)
-            }
-            trRect.contains(startX, startY) -> {
-                click(AppConfig.clickActionTR)
+            else -> {
+                click(1)
             }
         }
     }

@@ -34,7 +34,6 @@ import io.legado.app.ui.book.changesource.ChangeBookSourceDialog
 import io.legado.app.ui.book.group.GroupSelectDialog
 import io.legado.app.ui.book.info.edit.BookInfoEditActivity
 import io.legado.app.ui.book.read.ReadBookActivity
-import io.legado.app.ui.book.remote.manager.RemoteBookWebDav
 import io.legado.app.ui.book.search.SearchActivity
 import io.legado.app.ui.book.source.edit.BookSourceEditActivity
 import io.legado.app.ui.book.toc.TocActivityResult
@@ -204,25 +203,6 @@ class BookInfoActivity :
                 if (!item.isChecked) longToastOnUi(R.string.need_more_time_load_content)
             }
 
-            R.id.menu_upload -> {
-                launch {
-                    val uri = Uri.parse(viewModel.bookData.value?.bookUrl.toString())
-                    val waitDialog = WaitDialog(this@BookInfoActivity)
-                    waitDialog.setText("上传中.....")
-                    waitDialog.show()
-                    try {
-                        val isUpload = RemoteBookWebDav.upload(uri)
-                        if (isUpload)
-                            toastOnUi(getString(R.string.upload_book_success))
-                        else
-                            toastOnUi(getString(R.string.upload_book_fail))
-                    } catch (e: Exception) {
-                        toastOnUi(e.localizedMessage)
-                    } finally {
-                        waitDialog.dismiss()
-                    }
-                }
-            }
         }
         return super.onCompatOptionsItemSelected(item)
     }
