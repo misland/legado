@@ -12,8 +12,8 @@ static def releaseTime() {
     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+8"))
 }
 
-def name = "legado"
-def version = "3." + releaseTime()
+def name = "yuedu"
+def version = "1." + releaseTime()
 def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
 
 android {
@@ -25,6 +25,12 @@ android {
     }
 
     signingConfigs {
+        release {
+            storeFile file('C:\\shot\\android\\Yuedu.jks')
+            storePassword 'nbb@180702!'
+            keyAlias 'Yuedu'
+            keyPassword 'nbb@180702!'
+        }
         if (project.hasProperty("RELEASE_STORE_FILE")) {
             myConfig {
                 storeFile file(RELEASE_STORE_FILE)
@@ -39,7 +45,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "io.legado.app"
+        applicationId "io.yuedu.app"
         minSdkVersion 21
         targetSdkVersion 32
         versionCode 10000 + gitCommits
@@ -98,7 +104,7 @@ android {
         }
         google {
             dimension "mode"
-            applicationId "io.legado.play"
+            applicationId "io.yuedu.play"
             manifestPlaceholders = [APP_CHANNEL_VALUE: "google"]
         }
     }

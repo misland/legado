@@ -20,7 +20,6 @@ import io.legado.app.databinding.ActivityBookReadBinding
 import io.legado.app.databinding.DialogDownloadChoiceBinding
 import io.legado.app.databinding.DialogEditTextBinding
 import io.legado.app.help.config.AppConfig
-import io.legado.app.help.config.LocalConfig
 import io.legado.app.help.config.ReadBookConfig
 import io.legado.app.lib.dialogs.alert
 import io.legado.app.lib.dialogs.selector
@@ -30,7 +29,6 @@ import io.legado.app.lib.theme.bottomBackground
 import io.legado.app.model.CacheBook
 import io.legado.app.model.ReadBook
 import io.legado.app.ui.book.read.config.BgTextConfigDialog
-import io.legado.app.ui.book.read.config.ClickActionConfigDialog
 import io.legado.app.ui.book.read.config.PaddingConfigDialog
 import io.legado.app.ui.document.HandleFileContract
 import io.legado.app.utils.*
@@ -68,9 +66,6 @@ abstract class BaseReadBookActivity :
                 title = "选择书籍所在文件夹"
             }
         }
-        if (!LocalConfig.readHelpVersionIsLast) {
-            showClickRegionalConfig()
-        }
     }
 
     fun showPaddingConfig() {
@@ -79,10 +74,6 @@ abstract class BaseReadBookActivity :
 
     fun showBgTextConfig() {
         showDialogFragment<BgTextConfigDialog>()
-    }
-
-    fun showClickRegionalConfig() {
-        showDialogFragment<ClickActionConfigDialog>()
     }
 
     /**

@@ -134,9 +134,6 @@ class MoreConfigDialog : DialogFragment() {
         override fun onPreferenceTreeClick(preference: Preference): Boolean {
             when (preference.key) {
                 "customPageKey" -> PageKeyDialog(requireContext()).show()
-                "clickRegionalConfig" -> {
-                    (activity as? ReadBookActivity)?.showClickRegionalConfig()
-                }
             }
             return super.onPreferenceTreeClick(preference)
         }

@@ -86,24 +86,9 @@ class ReadView(context: Context, attrs: AttributeSet) :
 
     val slopSquare by lazy { ViewConfiguration.get(context).scaledTouchSlop }
 
-    // 第一行左边
-    private val tlRect = RectF()
-
-    // 第一行中间
-    private val tcRect = RectF()
-
-    // 第一行右边
-    private val trRect = RectF()
-
-    // 第二行左边
-    private val mlRect = RectF()
+    // 屏幕中间区域
     private val mcRect = RectF()
-    private val mrRect = RectF()
 
-    // 第三行左边
-    private val blRect = RectF()
-    private val bcRect = RectF()
-    private val brRect = RectF()
     private val autoPageRect by lazy { Rect() }
     private val autoPagePint by lazy { Paint().apply { color = context.accentColor } }
     private val boundary by lazy { BreakIterator.getWordInstance(Locale.getDefault()) }
@@ -119,17 +104,9 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
-    // 为九宫格设置对应区域
+    // 为屏幕中间设置对应区域
     private fun setRect9x() {
-        tlRect.set(0f, 0f, width * 0.33f, height * 0.33f)
-        tcRect.set(width * 0.33f, 0f, width * 0.66f, height * 0.33f)
-        trRect.set(width * 0.36f, 0f, width.toFloat(), height * 0.33f)
-        mlRect.set(0f, height * 0.33f, width * 0.33f, height * 0.66f)
         mcRect.set(width * 0.33f, height * 0.33f, width * 0.66f, height * 0.66f)
-        mrRect.set(width * 0.66f, height * 0.33f, width.toFloat(), height * 0.66f)
-        blRect.set(0f, height * 0.66f, width * 0.33f, height.toFloat())
-        bcRect.set(width * 0.33f, height * 0.66f, width * 0.66f, height.toFloat())
-        brRect.set(width * 0.66f, height * 0.66f, width.toFloat(), height.toFloat())
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
