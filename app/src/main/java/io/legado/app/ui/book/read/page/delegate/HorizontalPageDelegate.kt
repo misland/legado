@@ -108,7 +108,6 @@ abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readVie
         isMoved = false
         isRunning = false
         if (!scroller.isFinished) {
-            DebugLog.d(TAG, "====================>>>>>>>>>>>one")
             readView.isAbortAnim = true
             scroller.abortAnimation()
             if (!isCancel) {
@@ -117,7 +116,6 @@ abstract class HorizontalPageDelegate(readView: ReadView) : PageDelegate(readVie
                 readView.invalidate()
             }
         } else {
-            DebugLog.d(TAG, "====================>>>>>>>>>>>two")
             readView.isAbortAnim = false
         }
     }

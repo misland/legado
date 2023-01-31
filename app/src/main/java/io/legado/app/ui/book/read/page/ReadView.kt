@@ -86,9 +86,6 @@ class ReadView(context: Context, attrs: AttributeSet) :
 
     val slopSquare by lazy { ViewConfiguration.get(context).scaledTouchSlop }
 
-    // 屏幕中间区域
-    private val mcRect = RectF()
-
     private val autoPageRect by lazy { Rect() }
     private val autoPagePint by lazy { Paint().apply { color = context.accentColor } }
     private val boundary by lazy { BreakIterator.getWordInstance(Locale.getDefault()) }
@@ -104,14 +101,8 @@ class ReadView(context: Context, attrs: AttributeSet) :
         }
     }
 
-    // 为屏幕中间设置对应区域
-    private fun setRect9x() {
-        mcRect.set(width * 0.33f, height * 0.33f, width * 0.66f, height * 0.66f)
-    }
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        setRect9x()
         prevPage.x = -w.toFloat()
         pageDelegate?.setViewSize(w, h)
         if (w > 0 && h > 0) {
@@ -192,16 +183,18 @@ class ReadView(context: Context, attrs: AttributeSet) :
                     isMove =
                         abs(startX - event.x) > slopSquare || abs(startY - event.y) > slopSquare
                 }
-                DebugLog.d(
-                    TAG,
-                    "onTouchEvent->ACTION_MOVE->isMove=${isMove},isTextSelected=${isTextSelected}"
-                )
                 if (isMove) {
                     longPressed = false
                     removeCallbacks(longPressRunnable)
                     if (isTextSelected) {
                         selectText(event.x, event.y)
                     } else {
+                        // 下滑时调出菜单框
+                        if (event.y - startY > 0) {
+                            click(0)
+                            return true
+                        }
+                        DebugLog.d(TAG, "hello~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                         pageDelegate?.onTouch(event)
                     }
                 }
@@ -361,15 +354,10 @@ class ReadView(context: Context, attrs: AttributeSet) :
      * 单击屏幕事件处理
      */
     private fun onSingleTapUp() {
-        // 魔改：除了中间区域召唤菜单外，其它的区域，均改为下一页
+        // 魔改：单击屏幕所有区域，都是翻页
         when {
             isTextSelected -> isTextSelected = false
-            mcRect.contains(startX, startY) -> if (!isAbortAnim) {
-                click(AppConfig.clickActionMC)
-            }
-            else -> {
-                click(1)
-            }
+            !isAbortAnim -> click(1)
         }
     }
 
